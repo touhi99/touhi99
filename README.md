@@ -1,5 +1,7 @@
 ### Hi there 👋
 
+[![Tapos's GitHub stats](https://github-readme-stats.vercel.app/api?username=tapos12)](https://github.com/anuraghazra/github-readme-stats)
+
 <!--
 **tapos12/tapos12** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
