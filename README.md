@@ -1,6 +1,6 @@
 ### Hi there 👋
 
-[![Tapos's GitHub stats](https://github-readme-stats-one-ruddy-14.vercel.app/api?username=touhi99&&count_private=true&&show_icons=true&&theme=radical)](https://github.com/anuraghazra/github-readme-stats)
+[![Tapos's GitHub stats](https://github-readme-stats-one-ruddy-14.vercel.app/api?username=touhi99&&count_private=true&&show_icons=true&&hide_rank=true&&theme=radical)](https://github.com/anuraghazra/github-readme-stats)
 [![Top Langs](https://github-readme-stats-one-ruddy-14.vercel.app/api/top-langs/?username=touhi99&layout=compact&count_private=true&theme=radical)](https://github.com/anuraghazra/github-readme-stats)
 
 <!--
