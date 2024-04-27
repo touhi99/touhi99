@@ -2,6 +2,7 @@
 
 [![Tapos's GitHub stats](https://github-readme-stats-one-ruddy-14.vercel.app/api?username=touhi99&&count_private=true&&show_icons=true&&hide_rank=true&&theme=radical)](https://github.com/anuraghazra/github-readme-stats)
 [![Top Langs](https://github-readme-stats-one-ruddy-14.vercel.app/api/top-langs/?username=touhi99&layout=compact&count_private=true&theme=radical)](https://github.com/anuraghazra/github-readme-stats)
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=touhi99&repo=github-readme-stats)](https://github.com/anuraghazra/github-readme-stats)
 
 <!--
 **touhi99/touhi99** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
