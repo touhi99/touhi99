@@ -50,6 +50,11 @@ LABEL = "font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monosp
 MONO = "font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace"
 SANS = "font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
 
+# Kept out of the repositories/language stats: rendered artefacts, vendored
+# bundles, anything whose size says nothing about what you work in. Contribution
+# counts still include these repos — only the repo-level numbers skip them.
+EXCLUDE = {"master-thesis"}
+
 GRAPHQL = """
 query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
   user(login:$login) {
@@ -66,6 +71,7 @@ query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
       totalCount
       pageInfo { hasNextPage endCursor }
       nodes {
+        name
         isPrivate
         stargazerCount
         languages(first:15, orderBy:{field:SIZE, direction:DESC}) {
@@ -132,6 +138,8 @@ def fetch(login: str, tok: str) -> dict:
             break
         variables["after"] = page["pageInfo"]["endCursor"]
         page = graphql(GRAPHQL, variables, tok)["user"]["repositories"]
+
+    repos = [r for r in repos if r["name"] not in EXCLUDE]
 
     cal = user["contributionsCollection"]["contributionCalendar"]
     days = [(d["date"][:10], d["contributionCount"]) for w in cal["weeks"] for d in w["contributionDays"]]
