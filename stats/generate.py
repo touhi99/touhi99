@@ -330,16 +330,21 @@ def build(data: dict) -> str:
 
 
 def preview(svg: str, path: str) -> None:
+    """Both palettes side by side, forced rather than following the OS."""
+    import re
+
+    light = re.sub(r"@media \(prefers-color-scheme:dark\)\{.*?\n\}", "", svg, flags=re.S)
+    dark = svg.replace("@media (prefers-color-scheme:dark){", "@media all{")
     page = f"""<!doctype html><meta charset="utf-8"><title>profile card</title>
 <style>
-  body{{margin:0;padding:40px;display:grid;gap:32px;justify-content:center;
-        font:13px ui-monospace,Menlo,monospace;background:#fff;color:#666}}
-  .light{{background:#fff;padding:32px;border-radius:10px}}
-  .dark{{background:#0d1117;padding:32px;border-radius:10px}}
-  h2{{font:11px ui-monospace,Menlo,monospace;letter-spacing:1.5px;margin:0 0 16px;color:#999}}
+  body{{margin:0;padding:40px;display:grid;gap:24px;justify-content:center;
+        font:11px ui-monospace,Menlo,monospace;background:#fff;color:#999}}
+  .light{{background:#fff;padding:24px}}
+  .dark{{background:#0d1117;padding:24px}}
+  h2{{letter-spacing:1.5px;margin:0 0 14px}}
 </style>
-<div class="light"><h2>LIGHT</h2>{svg}</div>
-<div class="dark" style="color-scheme:dark"><h2>DARK</h2>{svg}</div>
+<div class="light"><h2>LIGHT</h2>{light}</div>
+<div class="dark"><h2 style="color:#666">DARK</h2>{dark}</div>
 """
     with open(path, "w") as fh:
         fh.write(page)
