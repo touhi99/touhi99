@@ -50,6 +50,11 @@ LABEL = "font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monosp
 MONO = "font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace"
 SANS = "font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
 
+# Kept out of the repositories/language stats: rendered artefacts, vendored
+# bundles, anything whose size says nothing about what you work in. Contribution
+# counts still include these repos — only the repo-level numbers skip them.
+EXCLUDE = {"master-thesis"}
+
 GRAPHQL = """
 query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
   user(login:$login) {
@@ -66,6 +71,7 @@ query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
       totalCount
       pageInfo { hasNextPage endCursor }
       nodes {
+        name
         isPrivate
         stargazerCount
         languages(first:15, orderBy:{field:SIZE, direction:DESC}) {
@@ -133,6 +139,8 @@ def fetch(login: str, tok: str) -> dict:
         variables["after"] = page["pageInfo"]["endCursor"]
         page = graphql(GRAPHQL, variables, tok)["user"]["repositories"]
 
+    repos = [r for r in repos if r["name"] not in EXCLUDE]
+
     cal = user["contributionsCollection"]["contributionCalendar"]
     days = [(d["date"][:10], d["contributionCount"]) for w in cal["weeks"] for d in w["contributionDays"]]
     coll = user["contributionsCollection"]
@@ -152,15 +160,24 @@ def fetch(login: str, tok: str) -> dict:
     }
 
 
-def languages(repos: list[dict]) -> list[tuple[str, int, str]]:
-    totals: dict[str, int] = {}
+def languages(repos: list[dict]) -> list[tuple[str, float, str]]:
+    """Share of projects per language, not share of bytes.
+
+    Summing bytes across repos lets one generated artefact (a rendered thesis,
+    a vendored bundle) outvote every real project. Each repository instead gets
+    one equal vote, so the numbers answer "what do I build with".
+    """
+    share: dict[str, float] = {}
     colors: dict[str, str] = {}
     for repo in repos:
-        for edge in repo["languages"]["edges"]:
+        edges = repo["languages"]["edges"]
+        total = sum(e["size"] for e in edges) or 1
+        for edge in edges:
             name = edge["node"]["name"]
-            totals[name] = totals.get(name, 0) + edge["size"]
+            share[name] = share.get(name, 0.0) + edge["size"] / total
             colors.setdefault(name, edge["node"]["color"] or "#8B949E")
-    return [(n, s, colors[n]) for n, s in sorted(totals.items(), key=lambda kv: -kv[1])]
+    weights = {name: value / max(len(repos), 1) for name, value in share.items()}
+    return [(n, w, colors[n]) for n, w in sorted(weights.items(), key=lambda kv: -kv[1])]
 
 
 def streaks(days: list[tuple[str, int]], today: dt.date) -> tuple[int, int]:
@@ -237,6 +254,7 @@ def build(data: dict) -> str:
     add(".label{%s;font-size:9.5px;letter-spacing:1.6px;fill:%s}" % (LABEL, LIGHT["muted"]))
     add(".ink{fill:%s}.muted{fill:%s}.rule{stroke:%s}" % (LIGHT["ink"], LIGHT["muted"], LIGHT["rule"]))
     add(".card{fill:%s;stroke:%s}" % (LIGHT["bg"], LIGHT["border"]))
+    add(".track{fill:%s}" % LIGHT["rule"])
     add(".accent{fill:%s}" % ACCENT_LIGHT)
     for i, color in enumerate(level_scale(LIGHT["empty"], ACCENT_LIGHT, (0.18, 0.42, 0.68, 1.0))):
         add(f".l{i + 1}{{fill:{color}}}")
@@ -245,6 +263,7 @@ def build(data: dict) -> str:
     add(".label{fill:%s}" % DARK["muted"])
     add(".ink{fill:%s}.muted{fill:%s}.rule{stroke:%s}" % (DARK["ink"], DARK["muted"], DARK["rule"]))
     add(".card{fill:%s;stroke:%s}" % (DARK["bg"], DARK["border"]))
+    add(".track{fill:%s}" % DARK["rule"])
     add(".accent{fill:%s}" % ACCENT_DARK)
     for i, color in enumerate(level_scale(DARK["empty"], ACCENT_DARK, (0.28, 0.52, 0.76, 1.0))):
         add(f".l{i + 1}{{fill:{color}}}")
@@ -302,13 +321,13 @@ def build(data: dict) -> str:
             )
     out.extend(rects)
 
-    # language split
+    # language split: one equal vote per repository
     langs = data["languages"][:5]
-    total_bytes = sum(s for _, s, _ in data["languages"]) or 1
     bar_y, bar_h = grid_y + grid_h + 20, 8
+    add(f'<rect class="track" x="{grid_x}" y="{bar_y}" width="{grid_w}" height="{bar_h}" rx="4"/>')
     x = float(grid_x)
-    for i, (_, size, _) in enumerate(langs):
-        w = max(3.0, grid_w * size / total_bytes)
+    for i, (_, weight, _) in enumerate(langs):
+        w = grid_w * weight
         cls = "accent" if i == 0 else "ink"
         op = [1.0, 0.42, 0.28, 0.18, 0.12][i]
         add(f'<rect class="{cls}" x="{x:.1f}" y="{bar_y}" width="{w:.1f}" height="{bar_h}" rx="4" opacity="{op}"/>')
@@ -316,19 +335,21 @@ def build(data: dict) -> str:
 
     legend_y = bar_y + 26
     lx = float(grid_x)
-    for i, (name, size, _) in enumerate(langs):
-        share = size / total_bytes * 100
-        text = f"{name} {share:.0f}%"
+    for i, (name, weight, _) in enumerate(langs):
+        text = f"{name} {weight * 100:.0f}%"
         op = [1.0, 0.42, 0.28, 0.18, 0.12][i]
         cls = "accent" if i == 0 else "ink"
         add(f'<rect class="{cls}" x="{lx:.1f}" y="{legend_y - 8}" width="7" height="7" rx="1.5" opacity="{op}"/>')
         add(f'<text class="label" x="{lx + 12:.1f}" y="{legend_y}" style="letter-spacing:.7px">{esc(text)}</text>')
         lx += 12 + len(text) * 5.9 + 20
 
+    note = "BY PROJECT"
     if data["private_repos"]:
+        note += f" · INCL. {data['private_repos']} PRIVATE REPOS"
+    if langs:
         add(
             f'<text class="label" x="{WIDTH - PAD}" y="{legend_y}" text-anchor="end" '
-            f'style="letter-spacing:.7px" opacity=".75">INCL. {data["private_repos"]} PRIVATE REPOS</text>'
+            f'style="letter-spacing:.7px" opacity=".75">{note}</text>'
         )
 
     # the year in numbers, the part a heatmap can't show

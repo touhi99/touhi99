@@ -1,10 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="880" height="414" viewBox="0 0 880 414" role="img" aria-labelledby="t">
-<title id="t">touhi99 — 395 contributions in the last year</title>
+<title id="t">touhi99 — 397 contributions in the last year</title>
 <style>
 text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-kerning:normal}
 .label{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:9.5px;letter-spacing:1.6px;font-size:9.5px;letter-spacing:1.6px;fill:#7C756A}
 .ink{fill:#17150F}.muted{fill:#7C756A}.rule{stroke:#E4DED3}
 .card{fill:#FAF8F5;stroke:#E8E2D8}
+.track{fill:#E4DED3}
 .accent{fill:#C25436}
 .l1{fill:#E7D1C6}
 .l2{fill:#DCAC9C}
@@ -15,6 +16,7 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 .label{fill:#8B949E}
 .ink{fill:#ECEFEE}.muted{fill:#8B949E}.rule{stroke:#242B35}
 .card{fill:#0F1319;stroke:#232A33}
+.track{fill:#242B35}
 .accent{fill:#E4704B}
 .l1{fill:#533632}
 .l2{fill:#834A3A}
@@ -25,7 +27,7 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 </style>
 <rect class="card" x=".5" y=".5" width="879" height="413" rx="14"/>
 <text class="label" x="44" y="44">CONTRIBUTIONS</text>
-<text class="ink" x="42" y="108" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:58px;font-weight:500;letter-spacing:-2px">395</text>
+<text class="ink" x="42" y="108" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:58px;font-weight:500;letter-spacing:-2px">397</text>
 <text class="muted" x="44" y="128" style="font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11.5px">in the last 12 months</text>
 <text class="label" x="648" y="62">CURRENT STREAK</text>
 <text class="ink" x="836" y="68" text-anchor="end" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:21px;font-weight:500;letter-spacing:-.5px">2</text>
@@ -413,34 +415,35 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <rect class="l1" x="824" y="166" width="12" height="12" rx="2.5"><title>2026-10-25: 15</title></rect>
 <rect class="l0" x="824" y="181" width="12" height="12" rx="2.5"><title>2026-10-26: 0</title></rect>
 <rect class="l3" x="824" y="196" width="12" height="12" rx="2.5"><title>2026-10-27: 93</title></rect>
-<rect class="l2" x="824" y="211" width="12" height="12" rx="2.5"><title>2026-10-28: 25</title></rect>
-<rect class="accent" x="44.0" y="288" width="685.5" height="8" rx="4" opacity="1.0"/>
-<rect class="ink" x="729.5" y="288" width="50.0" height="8" rx="4" opacity="0.42"/>
-<rect class="ink" x="779.5" y="288" width="21.9" height="8" rx="4" opacity="0.28"/>
-<rect class="ink" x="801.4" y="288" width="10.3" height="8" rx="4" opacity="0.18"/>
-<rect class="ink" x="811.7" y="288" width="8.3" height="8" rx="4" opacity="0.12"/>
+<rect class="l2" x="824" y="211" width="12" height="12" rx="2.5"><title>2026-10-28: 27</title></rect>
+<rect class="track" x="44" y="288" width="792" height="8" rx="4"/>
+<rect class="accent" x="44.0" y="288" width="526.7" height="8" rx="4" opacity="1.0"/>
+<rect class="ink" x="570.7" y="288" width="25.7" height="8" rx="4" opacity="0.42"/>
+<rect class="ink" x="596.4" y="288" width="24.8" height="8" rx="4" opacity="0.28"/>
+<rect class="ink" x="621.2" y="288" width="23.3" height="8" rx="4" opacity="0.18"/>
+<rect class="ink" x="644.5" y="288" width="23.3" height="8" rx="4" opacity="0.12"/>
 <rect class="accent" x="44.0" y="306" width="7" height="7" rx="1.5" opacity="1.0"/>
-<text class="label" x="56.0" y="314" style="letter-spacing:.7px">HTML 87%</text>
-<rect class="ink" x="123.2" y="306" width="7" height="7" rx="1.5" opacity="0.42"/>
-<text class="label" x="135.2" y="314" style="letter-spacing:.7px">Python 6%</text>
+<text class="label" x="56.0" y="314" style="letter-spacing:.7px">Python 67%</text>
+<rect class="ink" x="135.0" y="306" width="7" height="7" rx="1.5" opacity="0.42"/>
+<text class="label" x="147.0" y="314" style="letter-spacing:.7px">HTML 3%</text>
 <rect class="ink" x="208.3" y="306" width="7" height="7" rx="1.5" opacity="0.28"/>
-<text class="label" x="220.3" y="314" style="letter-spacing:.7px">Swift 3%</text>
-<rect class="ink" x="287.5" y="306" width="7" height="7" rx="1.5" opacity="0.18"/>
-<text class="label" x="299.5" y="314" style="letter-spacing:.7px">JavaScript 1%</text>
-<rect class="ink" x="396.2" y="306" width="7" height="7" rx="1.5" opacity="0.12"/>
-<text class="label" x="408.2" y="314" style="letter-spacing:.7px">TeX 1%</text>
-<text class="label" x="836" y="314" text-anchor="end" style="letter-spacing:.7px" opacity=".75">INCL. 12 PRIVATE REPOS</text>
+<text class="label" x="220.3" y="314" style="letter-spacing:.7px">TypeScript 3%</text>
+<rect class="ink" x="317.0" y="306" width="7" height="7" rx="1.5" opacity="0.18"/>
+<text class="label" x="329.0" y="314" style="letter-spacing:.7px">Java 3%</text>
+<rect class="ink" x="390.3" y="306" width="7" height="7" rx="1.5" opacity="0.12"/>
+<text class="label" x="402.3" y="314" style="letter-spacing:.7px">TeX 3%</text>
+<text class="label" x="836" y="314" text-anchor="end" style="letter-spacing:.7px" opacity=".75">BY PROJECT · INCL. 11 PRIVATE REPOS</text>
 <line class="rule" x1="44" y1="338" x2="836" y2="338"/>
 <text class="label" x="44.0" y="362">STARS</text>
 <text class="ink" x="43.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">89</text>
 <text class="label" x="176.0" y="362">REPOS</text>
-<text class="ink" x="175.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">35</text>
+<text class="ink" x="175.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">34</text>
 <text class="label" x="308.0" y="362">FOLLOWERS</text>
 <text class="ink" x="307.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">21</text>
 <text class="label" x="440.0" y="362">PRIVATE CONTRIBS</text>
 <text class="ink" x="439.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">391</text>
 <text class="label" x="572.0" y="362">PUBLIC CONTRIBS</text>
-<text class="ink" x="571.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">4</text>
+<text class="ink" x="571.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">6</text>
 <text class="label" x="704.0" y="362">SINCE</text>
 <text class="ink" x="703.0" y="390" style="font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:20px;font-weight:500;letter-spacing:-.4px">2016</text>
 </svg>
