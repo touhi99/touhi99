@@ -24,7 +24,7 @@ from bisect import bisect_right
 
 # --- look -----------------------------------------------------------------
 
-WIDTH, HEIGHT = 880, 332
+WIDTH, HEIGHT = 880, 414
 PAD = 44
 ACCENT_LIGHT = "#C25436"
 ACCENT_DARK = "#E4704B"
@@ -53,6 +53,8 @@ SANS = "font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',He
 GRAPHQL = """
 query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
   user(login:$login) {
+    createdAt
+    followers { totalCount }
     contributionsCollection(from:$from, to:$to) {
       restrictedContributionsCount
       contributionCalendar {
@@ -133,11 +135,15 @@ def fetch(login: str, tok: str) -> dict:
 
     cal = user["contributionsCollection"]["contributionCalendar"]
     days = [(d["date"][:10], d["contributionCount"]) for w in cal["weeks"] for d in w["contributionDays"]]
+    coll = user["contributionsCollection"]
 
     return {
         "days": days,
         "total": cal["totalContributions"],
-        "private_contribs": user["contributionsCollection"]["restrictedContributionsCount"],
+        "private_contribs": coll["restrictedContributionsCount"],
+        "public_contribs": cal["totalContributions"] - coll["restrictedContributionsCount"],
+        "since": int(user["createdAt"][:4]),
+        "followers": user["followers"]["totalCount"],
         "repos": len(repos),
         "private_repos": sum(1 for r in repos if r["isPrivate"]),
         "stars": sum(r["stargazerCount"] for r in repos),
@@ -323,6 +329,24 @@ def build(data: dict) -> str:
         add(
             f'<text class="label" x="{WIDTH - PAD}" y="{legend_y}" text-anchor="end" '
             f'style="letter-spacing:.7px" opacity=".75">INCL. {data["private_repos"]} PRIVATE REPOS</text>'
+        )
+
+    # the year in numbers, the part a heatmap can't show
+    add(f'<line class="rule" x1="{PAD}" y1="338" x2="{WIDTH - PAD}" y2="338"/>')
+    stats = [
+        ("STARS", f"{data['stars']:,}"),
+        ("REPOS", f"{data['repos']:,}"),
+        ("FOLLOWERS", f"{data['followers']:,}"),
+        ("PRIVATE CONTRIBS", f"{data['private_contribs']:,}"),
+        ("PUBLIC CONTRIBS", f"{data['public_contribs']:,}"),
+        ("SINCE", str(data["since"])),
+    ]
+    for i, (label, value) in enumerate(stats):
+        x = grid_x + i * grid_w / len(stats)
+        add(f'<text class="label" x="{x:.1f}" y="362">{label}</text>')
+        add(
+            f'<text class="ink" x="{x - 1:.1f}" y="390" '
+            f'style="{MONO};font-size:20px;font-weight:500;letter-spacing:-.4px">{value}</text>'
         )
 
     add("</svg>")
