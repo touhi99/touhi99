@@ -1,2 +1,5 @@
 stats/preview.html
 .DS_Store
+__pycache__/
+.vercel
+.env*

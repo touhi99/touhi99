@@ -1,6 +1,6 @@
 ### Hi there 👋
 
-<img src="stats/card.svg" alt="Touhidul Alam's GitHub activity: contributions, streaks and languages over the last 12 months" width="880">
+<img src="https://touhi99.vercel.app/api/card" alt="Touhidul Alam's GitHub activity: contributions, streaks and languages over the last 12 months" width="880">
 
 <!--
 **touhi99/touhi99** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.

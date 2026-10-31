@@ -358,10 +358,14 @@ def build(data: dict) -> str:
         ("STARS", f"{data['stars']:,}"),
         ("REPOS", f"{data['repos']:,}"),
         ("FOLLOWERS", f"{data['followers']:,}"),
-        ("PRIVATE CONTRIBS", f"{data['private_contribs']:,}"),
-        ("PUBLIC CONTRIBS", f"{data['public_contribs']:,}"),
-        ("SINCE", str(data["since"])),
     ]
+    # A token that cannot see private contributions reports zero, which would
+    # read as "none" rather than "hidden". Leave the column out until they are
+    # visible; it comes back on its own once the token/profile setting allows.
+    if data["private_contribs"]:
+        stats.append(("PRIVATE CONTRIBS", f"{data['private_contribs']:,}"))
+    stats.append(("PUBLIC CONTRIBS", f"{data['public_contribs']:,}"))
+    stats.append(("SINCE", str(data["since"])))
     for i, (label, value) in enumerate(stats):
         x = grid_x + i * grid_w / len(stats)
         add(f'<text class="label" x="{x:.1f}" y="362">{label}</text>')
