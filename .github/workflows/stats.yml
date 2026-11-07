@@ -1,0 +1,47 @@
+name: stats card
+
+on:
+  schedule:
+    - cron: "17 5 * * *" # daily, off the hour to stay out of the queue
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["stats/generate.py", ".github/workflows/stats.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats-card
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The default GITHUB_TOKEN only sees public data. Private repos and the
+      # private contributions on the heatmap need a classic PAT stored as
+      # STATS_TOKEN (Settings -> Secrets and variables -> Actions).
+      - name: Render
+        env:
+          GITHUB_TOKEN: ${{ secrets.STATS_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_LOGIN: touhi99
+        run: python3 stats/generate.py --out stats/card.svg --require-private
+
+      - name: Commit
+        run: |
+          if git diff --quiet -- stats/card.svg; then
+            echo "card unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stats/card.svg
+          git commit -m "chore: refresh stats card"
+          git push

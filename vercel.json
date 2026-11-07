@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "api/card.py": {
-      "maxDuration": 30,
-      "includeFiles": "stats/generate.py"
-    }
-  }
-}

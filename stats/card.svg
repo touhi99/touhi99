@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="500" viewBox="0 0 880 500" role="img" aria-labelledby="t" aria-describedby="d">
+<title id="t">touhi99 — a year in numbers</title>
+<desc id="d">10 active days (3% of the year), 40 contributions, 29 commits, 6 pull requests, 0 reviews, 4 issues, across 6 repositories.</desc>
+<style>
+text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-kerning:normal}
+.label{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:9.5px;letter-spacing:1.5px;fill:#6F675C}
+.label-sm{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:9px;letter-spacing:1.0px;fill:#6F675C}
+.data-sm{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:9px;fill:#17150F}
+.lang{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:10px;fill:#6F675C}
+.lang-val{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:10px;fill:#17150F}
+.ink{fill:#17150F}.muted{fill:#6F675C}
+.card{fill:#FAF8F5;stroke:#E8E2D8}
+.rule{stroke:#E4DED3}.axis{stroke:#D8D1C4}
+.accent{fill:#C25436}.bar{fill:#C25436}
+.track{fill:#F2E1DA}
+@media (prefers-color-scheme:dark){
+.label{fill:#8B949E}.label-sm{fill:#8B949E}.data-sm{fill:#ECEFEE}
+.lang{fill:#8B949E}.lang-val{fill:#ECEFEE}
+.ink{fill:#ECEFEE}.muted{fill:#8B949E}
+.card{fill:#0F1319;stroke:#232A33}
+.rule{stroke:#242B35}.axis{stroke:#2E3641}
+.accent{fill:#E4704B}.bar{fill:#E4704B}
+.track{fill:#3E2724}
+}
+</style>
+<rect class="card" x="0.5" y="0.5" width="879.0" height="499.0" rx="14"/>
+<text class="label" x="40.0" y="40.0">A YEAR IN NUMBERS</text>
+<text class="label" x="840.0" y="40.0" text-anchor="end">touhi99 · SINCE 2016</text>
+<text class="label" x="40.0" y="76.0">ACTIVE DAYS</text>
+<text class="ink" x="38.0" y="140.0" style="font-size:58px;font-weight:600;letter-spacing:-1.5px">10</text>
+<text class="muted" x="40.0" y="162.0" style="font-size:10.5px">3% of the last 365 days</text>
+<text class="label" x="420.0" y="76.0">CURRENT STREAK</text>
+<text class="ink" x="419.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">3d</text>
+<text class="muted" x="420.0" y="146.0" style="font-size:9px">days in a row</text>
+<text class="label" x="620.0" y="76.0">LONGEST STREAK</text>
+<text class="ink" x="619.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">3d</text>
+<text class="muted" x="620.0" y="146.0" style="font-size:9px">this year</text>
+<line class="rule" x1="40.0" y1="200.0" x2="840.0" y2="200.0" stroke-width="1"/>
+<text class="label" x="40.0" y="226.0">DAYS ACTIVE BY MONTH</text>
+<text class="label-sm" x="500.0" y="226.0" text-anchor="end">* CURRENT MONTH TO DATE</text>
+<line class="rule" x1="74.0" y1="248.0" x2="500.0" y2="248.0" stroke-width="1"/>
+<text class="label-sm" x="68.0" y="251.0" text-anchor="end">100%</text>
+<line class="rule" x1="74.0" y1="290.0" x2="500.0" y2="290.0" stroke-width="1"/>
+<text class="label-sm" x="68.0" y="293.0" text-anchor="end">50%</text>
+<text class="label-sm" x="68.0" y="335.0" text-anchor="end">0%</text>
+<line class="axis" x1="74.0" y1="332.0" x2="500.0" y2="332.0" stroke-width="1"/>
+<path class="bar" d="M81.8,332.0 L81.8,330.6 Q81.8,326.6 85.8,326.6 L97.8,326.6 Q101.8,326.6 101.8,330.6 L101.8,332.0 Z"/>
+<text class="label-sm" x="91.8" y="348.0" text-anchor="middle">DEC</text>
+<text class="label-sm" x="127.2" y="348.0" text-anchor="middle">JAN</text>
+<text class="label-sm" x="162.8" y="348.0" text-anchor="middle">FEB</text>
+<text class="label-sm" x="198.2" y="348.0" text-anchor="middle">MAR</text>
+<text class="label-sm" x="233.8" y="348.0" text-anchor="middle">APR</text>
+<text class="label-sm" x="269.2" y="348.0" text-anchor="middle">MAY</text>
+<text class="label-sm" x="304.8" y="348.0" text-anchor="middle">JUN</text>
+<text class="label-sm" x="340.2" y="348.0" text-anchor="middle">JUL</text>
+<text class="label-sm" x="375.8" y="348.0" text-anchor="middle">AUG</text>
+<text class="label-sm" x="411.2" y="348.0" text-anchor="middle">SEP</text>
+<path class="bar" d="M436.8,332.0 L436.8,327.9 Q436.8,323.9 440.8,323.9 L452.8,323.9 Q456.8,323.9 456.8,327.9 L456.8,332.0 Z"/>
+<text class="label-sm" x="446.8" y="348.0" text-anchor="middle">OCT</text>
+<path class="bar" d="M472.2,332.0 L472.2,276.0 Q472.2,272.0 476.2,272.0 L488.2,272.0 Q492.2,272.0 492.2,276.0 L492.2,332.0 Z"/>
+<text class="label-sm" x="482.2" y="348.0" text-anchor="middle">NOV*</text>
+<text class="data-sm" x="482.2" y="266.0" text-anchor="middle">71%</text>
+<text class="label" x="540.0" y="226.0">HOW THE YEAR WAS SPENT</text>
+<text class="label-sm" x="540.0" y="252.0">COMMITS</text>
+<text class="ink" x="539.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">29</text>
+<text class="label-sm" x="696.0" y="252.0">PULL REQUESTS</text>
+<text class="ink" x="695.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">6</text>
+<text class="label-sm" x="540.0" y="310.0">REVIEWS</text>
+<text class="ink" x="539.0" y="340.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">0</text>
+<text class="label-sm" x="696.0" y="310.0">ISSUES</text>
+<text class="ink" x="695.0" y="340.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">4</text>
+<text class="label-sm" x="540.0" y="358.0">ACROSS 6 REPOSITORIES</text>
+<line class="rule" x1="40.0" y1="372.0" x2="840.0" y2="372.0" stroke-width="1"/>
+<text class="label" x="40.0" y="396.0">LANGUAGES BY PROJECT</text>
+<text class="label-sm" x="500.0" y="396.0" text-anchor="end">TOP 5 OF 14</text>
+<text class="lang" x="40.0" y="417.0">Python</text>
+<rect class="track" x="160.0" y="411.0" width="300.0" height="6.0" rx="3"/>
+<path class="bar" d="M160.0,411.0 L457.0,411.0 Q460.0,411.0 460.0,414.0 L460.0,414.0 Q460.0,417.0 457.0,417.0 L160.0,417.0 Z"/>
+<text class="lang-val" x="500.0" y="417.0" text-anchor="end">70%</text>
+<text class="lang" x="40.0" y="434.0">TypeScript</text>
+<rect class="track" x="160.0" y="428.0" width="300.0" height="6.0" rx="3"/>
+<path class="bar" d="M160.0,428.0 L183.4,428.0 Q186.4,428.0 186.4,431.0 L186.4,431.0 Q186.4,434.0 183.4,434.0 L160.0,434.0 Z"/>
+<text class="lang-val" x="500.0" y="434.0" text-anchor="end">6%</text>
+<text class="lang" x="40.0" y="451.0">HTML</text>
+<rect class="track" x="160.0" y="445.0" width="300.0" height="6.0" rx="3"/>
+<path class="bar" d="M160.0,445.0 L178.3,445.0 Q181.3,445.0 181.3,448.0 L181.3,448.0 Q181.3,451.0 178.3,451.0 L160.0,451.0 Z"/>
+<text class="lang-val" x="500.0" y="451.0" text-anchor="end">5%</text>
+<text class="lang" x="40.0" y="468.0">JavaScript</text>
+<rect class="track" x="160.0" y="462.0" width="300.0" height="6.0" rx="3"/>
+<path class="bar" d="M160.0,462.0 L171.6,462.0 Q174.6,462.0 174.6,465.0 L174.6,465.0 Q174.6,468.0 171.6,468.0 L160.0,468.0 Z"/>
+<text class="lang-val" x="500.0" y="468.0" text-anchor="end">3%</text>
+<text class="lang" x="40.0" y="485.0">Swift</text>
+<rect class="track" x="160.0" y="479.0" width="300.0" height="6.0" rx="3"/>
+<path class="bar" d="M160.0,479.0 L170.4,479.0 Q173.4,479.0 173.4,482.0 L173.4,482.0 Q173.4,485.0 170.4,485.0 L160.0,485.0 Z"/>
+<text class="lang-val" x="500.0" y="485.0" text-anchor="end">3%</text>
+<text class="label-sm" x="540.0" y="396.0">LONGEST GAP</text>
+<text class="ink" x="539.0" y="420.0" style="font-size:24px;font-weight:600;letter-spacing:-.6px">305d</text>
+<text class="label-sm" x="696.0" y="396.0">LAST 90 VS PRIOR</text>
+<text class="ink" x="695.0" y="420.0" style="font-size:24px;font-weight:600;letter-spacing:-.6px">38</text>
+<text class="label-sm" x="731.8" y="420.0">—</text>
+<text class="label-sm" x="540.0" y="444.0">AVG / ACTIVE DAY</text>
+<text class="ink" x="539.0" y="468.0" style="font-size:24px;font-weight:600;letter-spacing:-.6px">4.0</text>
+<text class="label-sm" x="696.0" y="444.0">BUSIEST DAY</text>
+<text class="ink" x="695.0" y="468.0" style="font-size:24px;font-weight:600;letter-spacing:-.6px">SUN</text>
+</svg>

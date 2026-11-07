@@ -1,6 +1,5 @@
 stats/preview.html
 stats/preview-card.html
-stats/card.svg
 .DS_Store
 __pycache__/
 .vercel

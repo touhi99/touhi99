@@ -1,6 +1,6 @@
 ### Hi there 👋
 
-<img src="https://touhi99.vercel.app/api/card" alt="Touhidul Alam's last year in numbers: active days, private share, work mix, consistency, streaks and languages" width="880">
+<img src="stats/card.svg" alt="Touhidul Alam's last year in numbers: active days, private share, work mix, consistency, streaks and languages" width="880">
 
 <!--
 **touhi99/touhi99** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
