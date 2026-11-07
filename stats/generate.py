@@ -3,11 +3,14 @@
 
     GITHUB_TOKEN=$(gh auth token) python3 stats/generate.py --out stats/card.svg
 
-The card is a single image: a year of contributions as a heatmap, the streak
-numbers that matter, and how the code splits across languages. Both palettes
-are baked into the file, so one embed is correct in light and dark mode.
+The card answers questions GitHub's own profile page does not: how consistent
+the year was, how much of the work is private, how the work splits across
+commits / pull requests / reviews / issues, and which languages the projects
+are built in. No repository name is ever printed, so a private-heavy year
+still gets a complete card.
 
-No dependencies beyond the Python standard library.
+Both palettes are baked into the file, so one embed is correct in light and
+dark mode. No dependencies beyond the Python standard library.
 """
 
 from __future__ import annotations
@@ -20,12 +23,11 @@ import shutil
 import subprocess
 import sys
 import urllib.request
-from bisect import bisect_right
 
 # --- look -----------------------------------------------------------------
 
-WIDTH, HEIGHT = 880, 414
-PAD = 44
+WIDTH, HEIGHT = 880, 500
+PAD = 40
 ACCENT_LIGHT = "#C25436"
 ACCENT_DARK = "#E4704B"
 
@@ -33,8 +35,9 @@ LIGHT = {
     "bg": "#FAF8F5",
     "border": "#E8E2D8",
     "ink": "#17150F",
-    "muted": "#7C756A",
+    "muted": "#6F675C",  # 5.25:1 on bg — safe for 8-10px labels
     "rule": "#E4DED3",
+    "axis": "#D8D1C4",
     "empty": "#EFECE5",
 }
 DARK = {
@@ -43,12 +46,14 @@ DARK = {
     "ink": "#ECEFEE",
     "muted": "#8B949E",
     "rule": "#242B35",
+    "axis": "#2E3641",
     "empty": "#1A2028",
 }
 
-LABEL = "font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:9.5px;letter-spacing:1.6px"
-MONO = "font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace"
-SANS = "font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+MONO_FAMILY = "ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace"
+SANS_FAMILY = (
+    "ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+)
 
 # Kept out of the repositories/language stats: rendered artefacts, vendored
 # bundles, anything whose size says nothing about what you work in. Contribution
@@ -59,13 +64,20 @@ GRAPHQL = """
 query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
   user(login:$login) {
     createdAt
-    followers { totalCount }
     contributionsCollection(from:$from, to:$to) {
+      totalCommitContributions
+      totalIssueContributions
+      totalPullRequestContributions
+      totalPullRequestReviewContributions
       restrictedContributionsCount
       contributionCalendar {
         totalContributions
         weeks { contributionDays { date contributionCount } }
       }
+      commitContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
+      pullRequestContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
+      issueContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
+      pullRequestReviewContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
     }
     repositories(first:100, after:$after, ownerAffiliations:OWNER, isFork:false) {
       totalCount
@@ -73,7 +85,6 @@ query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
       nodes {
         name
         isPrivate
-        stargazerCount
         languages(first:15, orderBy:{field:SIZE, direction:DESC}) {
           edges { size node { name color } }
         }
@@ -141,21 +152,49 @@ def fetch(login: str, tok: str) -> dict:
 
     repos = [r for r in repos if r["name"] not in EXCLUDE]
 
-    cal = user["contributionsCollection"]["contributionCalendar"]
-    days = [(d["date"][:10], d["contributionCount"]) for w in cal["weeks"] for d in w["contributionDays"]]
     coll = user["contributionsCollection"]
+    cal = coll["contributionCalendar"]
+    all_days = [
+        (d["date"][:10], d["contributionCount"])
+        for w in cal["weeks"]
+        for d in w["contributionDays"]
+    ]
+    # The calendar is Sunday-aligned, so it can carry a few days beyond the
+    # requested window. Every stat below uses exactly the 365-day window.
+    days = [
+        (d, c)
+        for d, c in all_days
+        if start <= dt.date.fromisoformat(d) <= today
+    ]
+
+    # Count repositories touched without ever storing a name for the card.
+    touched: set[str] = set()
+    for key in (
+        "commitContributionsByRepository",
+        "pullRequestContributionsByRepository",
+        "issueContributionsByRepository",
+        "pullRequestReviewContributionsByRepository",
+    ):
+        for edge in coll[key] or []:
+            repo = edge.get("repository")
+            if repo:
+                touched.add(repo["nameWithOwner"])
 
     return {
         "days": days,
         "total": cal["totalContributions"],
         "private_contribs": coll["restrictedContributionsCount"],
-        "public_contribs": cal["totalContributions"] - coll["restrictedContributionsCount"],
+        "public_contribs": cal["totalContributions"]
+        - coll["restrictedContributionsCount"],
         "since": int(user["createdAt"][:4]),
-        "followers": user["followers"]["totalCount"],
         "repos": len(repos),
         "private_repos": sum(1 for r in repos if r["isPrivate"]),
-        "stars": sum(r["stargazerCount"] for r in repos),
         "languages": languages(repos),
+        "commits": coll["totalCommitContributions"],
+        "prs": coll["totalPullRequestContributions"],
+        "issues": coll["totalIssueContributions"],
+        "reviews": coll["totalPullRequestReviewContributions"],
+        "touched": len(touched),
         "today": today,
     }
 
@@ -198,6 +237,75 @@ def streaks(days: list[tuple[str, int]], today: dt.date) -> tuple[int, int]:
     return current, longest
 
 
+def longest_gap(days: list[tuple[str, int]]) -> int:
+    """Longest run of consecutive days without a contribution."""
+    longest = run = 0
+    for _, count in days:
+        run = run + 1 if count == 0 else 0
+        longest = max(longest, run)
+    return longest
+
+
+def add_months(day: dt.date, delta: int) -> dt.date:
+    y = day.year + (day.month - 1 + delta) // 12
+    m = (day.month - 1 + delta) % 12 + 1
+    return dt.date(y, m, 1)
+
+
+def monthly_consistency(
+    days: list[tuple[str, int]], today: dt.date
+) -> list[tuple[str, float, bool]]:
+    """Share of days active in each of the last 12 calendar months.
+
+    A rate rather than a count, so a partly-elapsed current month and a full
+    month are directly comparable.
+    """
+    by_date = {dt.date.fromisoformat(d): c for d, c in days}
+    first = add_months(today.replace(day=1), -11)
+    window_start = today - dt.timedelta(days=364)
+    out: list[tuple[str, float, bool]] = []
+    for i in range(12):
+        m0 = add_months(first, i)
+        m1 = add_months(m0, 1) - dt.timedelta(days=1)
+        lo = max(m0, window_start)
+        hi = min(m1, today)
+        span = (hi - lo).days + 1
+        active = sum(1 for d, c in by_date.items() if lo <= d <= hi and c > 0)
+        out.append(
+            (
+                m0.strftime("%b").upper(),
+                active / span if span > 0 else 0.0,
+                m0.year == today.year and m0.month == today.month,
+            )
+        )
+    return out
+
+
+def momentum(days: list[tuple[str, int]], today: dt.date) -> tuple[int, int | None]:
+    """(last 90 days, percent change vs the 90 before), or None without history."""
+    by_date = {dt.date.fromisoformat(d): c for d, c in days}
+    recent_lo = today - dt.timedelta(days=89)
+    prior_hi = today - dt.timedelta(days=90)
+    prior_lo = today - dt.timedelta(days=179)
+    recent = sum(c for d, c in by_date.items() if recent_lo <= d <= today)
+    prior = sum(c for d, c in by_date.items() if prior_lo <= d <= prior_hi)
+    if prior == 0:
+        return recent, None
+    return recent, round((recent - prior) / prior * 100)
+
+
+def busiest_day(days: list[tuple[str, int]]) -> str:
+    totals = [0] * 7
+    counts = [0] * 7
+    for d, count in days:
+        wd = dt.date.fromisoformat(d).weekday()
+        totals[wd] += count
+        counts[wd] += 1
+    avg = [totals[i] / counts[i] if counts[i] else 0.0 for i in range(7)]
+    names = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+    return names[max(range(7), key=lambda i: avg[i])]
+
+
 # --- drawing --------------------------------------------------------------
 
 
@@ -211,179 +319,327 @@ def esc(text: str) -> str:
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def level_scale(bg: str, accent: str, ramp: tuple[float, ...]) -> list[str]:
-    return [mix(bg, accent, t) for t in ramp]
+def t(
+    x: float,
+    y: float,
+    body: str,
+    cls: str = "",
+    style: str = "",
+    anchor: str = "start",
+    opacity: float | None = None,
+) -> str:
+    extra = ""
+    if anchor != "start":
+        extra += f' text-anchor="{anchor}"'
+    if opacity is not None:
+        extra += f' opacity="{opacity}"'
+    if style:
+        extra += f' style="{style}"'
+    return f'<text class="{cls}" x="{x:.1f}" y="{y:.1f}"{extra}>{body}</text>'
+
+
+def rule(x1: float, y1: float, x2: float, y2: float, cls: str = "rule") -> str:
+    return (
+        f'<line class="{cls}" x1="{x1:.1f}" y1="{y1:.1f}" '
+        f'x2="{x2:.1f}" y2="{y2:.1f}" stroke-width="1"/>'
+    )
+
+
+def box(x: float, y: float, w: float, h: float, cls: str, rx: float = 0) -> str:
+    return (
+        f'<rect class="{cls}" x="{x:.1f}" y="{y:.1f}" '
+        f'width="{w:.1f}" height="{h:.1f}" rx="{rx}"/>'
+    )
+
+
+def column(x: float, top: float, w: float, base: float, r: float = 4) -> str:
+    """A bar growing up from a baseline: rounded data-end, square at the base."""
+    h = base - top
+    if h <= 0.5:
+        return ""
+    r = min(r, h, w / 2)
+    return (
+        f"M{x:.1f},{base:.1f} L{x:.1f},{top + r:.1f} "
+        f"Q{x:.1f},{top:.1f} {x + r:.1f},{top:.1f} "
+        f"L{x + w - r:.1f},{top:.1f} Q{x + w:.1f},{top:.1f} {x + w:.1f},{top + r:.1f} "
+        f"L{x + w:.1f},{base:.1f} Z"
+    )
+
+
+def ranked_bar(x: float, y: float, w: float, h: float, r: float = 3) -> str:
+    """A horizontal ranked bar: square at the baseline, rounded at the data-end."""
+    if w <= 0.5:
+        return ""
+    r = min(r, w, h / 2)
+    return (
+        f"M{x:.1f},{y:.1f} L{x + w - r:.1f},{y:.1f} "
+        f"Q{x + w:.1f},{y:.1f} {x + w:.1f},{y + r:.1f} "
+        f"L{x + w:.1f},{y + h - r:.1f} Q{x + w:.1f},{y + h:.1f} {x + w - r:.1f},{y + h:.1f} "
+        f"L{x:.1f},{y + h:.1f} Z"
+    )
 
 
 def build(data: dict) -> str:
     today = data["today"]
-    by_date = {dt.date.fromisoformat(d): c for d, c in data["days"]}
-
-    # Sunday-aligned grid, 53 weeks. Same geometry GitHub itself uses.
-    start = today - dt.timedelta(days=364)
-    start -= dt.timedelta(days=(start.weekday() + 1) % 7)  # back to Sunday
-
-    current, longest = streaks(data["days"], today)
-    active = sum(1 for _, c in data["days"] if c > 0)
-    cols = (today - start).days // 7 + 1
-
-    cell, gap = 12, 3
-    pitch = cell + gap
-    grid_w = cols * pitch - gap
-    grid_x, grid_y = PAD, 166
-    grid_h = 7 * pitch - gap
-
-    levels = sorted(c for _, c in data["days"] if c > 0) or [1]
-    cuts = [levels[min(len(levels) - 1, int(len(levels) * q))] for q in (0.35, 0.6, 0.82)]
-
-    def level(count: int) -> int:
-        if count <= 0:
-            return 0
-        return 1 + bisect_right(cuts, count - 0.5)
+    days = data["days"]
+    total = data["total"]
+    active = sum(1 for _, c in days if c > 0)
+    rate = active / len(days) if days else 0.0
+    current, longest = streaks(days, today)
+    gap = longest_gap(days)
+    avg = total / active if active else 0.0
+    private = data["private_contribs"]
+    private_share = private / total if total else 0.0
+    monthly = monthly_consistency(days, today)
+    recent, delta = momentum(days, today)
+    busiest = busiest_day(days)
+    login = data["login"]
 
     out: list[str] = []
     add = out.append
 
     add(
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" '
-        f'viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="t">'
+        f'viewBox="0 0 {WIDTH} {HEIGHT}" role="img" aria-labelledby="t" '
+        f'aria-describedby="d">'
     )
-    add(f'<title id="t">{esc(data["login"])} — {data["total"]:,} contributions in the last year</title>')
+    add(f'<title id="t">{esc(login)} — a year in numbers</title>')
+    add(
+        f'<desc id="d">{active} active days ({rate * 100:.0f}% of the year), '
+        f"{total:,} contributions, {data['commits']:,} commits, "
+        f"{data['prs']:,} pull requests, {data['reviews']:,} reviews, "
+        f"{data['issues']:,} issues, across {data['touched']} repositories.</desc>"
+    )
+
     add("<style>")
-    add(f"text{{{SANS};font-kerning:normal}}")
-    add(".label{%s;font-size:9.5px;letter-spacing:1.6px;fill:%s}" % (LABEL, LIGHT["muted"]))
-    add(".ink{fill:%s}.muted{fill:%s}.rule{stroke:%s}" % (LIGHT["ink"], LIGHT["muted"], LIGHT["rule"]))
-    add(".card{fill:%s;stroke:%s}" % (LIGHT["bg"], LIGHT["border"]))
-    add(".track{fill:%s}" % LIGHT["rule"])
-    add(".accent{fill:%s}" % ACCENT_LIGHT)
-    for i, color in enumerate(level_scale(LIGHT["empty"], ACCENT_LIGHT, (0.18, 0.42, 0.68, 1.0))):
-        add(f".l{i + 1}{{fill:{color}}}")
-    add(f".l0{{fill:{LIGHT['empty']}}}")
+    add(f"text{{font-family:{SANS_FAMILY};font-kerning:normal}}")
+    add(
+        f".label{{font-family:{MONO_FAMILY};font-size:9.5px;letter-spacing:1.5px;"
+        f"fill:{LIGHT['muted']}}}"
+    )
+    add(
+        f".label-sm{{font-family:{MONO_FAMILY};font-size:9px;letter-spacing:1.0px;"
+        f"fill:{LIGHT['muted']}}}"
+    )
+    add(f".data-sm{{font-family:{MONO_FAMILY};font-size:9px;fill:{LIGHT['ink']}}}")
+    add(f".lang{{font-family:{SANS_FAMILY};font-size:10px;fill:{LIGHT['muted']}}}")
+    add(f".lang-val{{font-family:{SANS_FAMILY};font-size:10px;fill:{LIGHT['ink']}}}")
+    add(f".ink{{fill:{LIGHT['ink']}}}.muted{{fill:{LIGHT['muted']}}}")
+    add(f".card{{fill:{LIGHT['bg']};stroke:{LIGHT['border']}}}")
+    add(f".rule{{stroke:{LIGHT['rule']}}}.axis{{stroke:{LIGHT['axis']}}}")
+    add(f".accent{{fill:{ACCENT_LIGHT}}}.bar{{fill:{ACCENT_LIGHT}}}")
+    add(f".track{{fill:{mix(LIGHT['bg'], ACCENT_LIGHT, 0.14)}}}")
     add("@media (prefers-color-scheme:dark){")
-    add(".label{fill:%s}" % DARK["muted"])
-    add(".ink{fill:%s}.muted{fill:%s}.rule{stroke:%s}" % (DARK["ink"], DARK["muted"], DARK["rule"]))
-    add(".card{fill:%s;stroke:%s}" % (DARK["bg"], DARK["border"]))
-    add(".track{fill:%s}" % DARK["rule"])
-    add(".accent{fill:%s}" % ACCENT_DARK)
-    for i, color in enumerate(level_scale(DARK["empty"], ACCENT_DARK, (0.28, 0.52, 0.76, 1.0))):
-        add(f".l{i + 1}{{fill:{color}}}")
-    add(f".l0{{fill:{DARK['empty']}}}")
+    add(
+        f".label{{fill:{DARK['muted']}}}.label-sm{{fill:{DARK['muted']}}}"
+        f".data-sm{{fill:{DARK['ink']}}}"
+    )
+    add(f".lang{{fill:{DARK['muted']}}}.lang-val{{fill:{DARK['ink']}}}")
+    add(f".ink{{fill:{DARK['ink']}}}.muted{{fill:{DARK['muted']}}}")
+    add(f".card{{fill:{DARK['bg']};stroke:{DARK['border']}}}")
+    add(f".rule{{stroke:{DARK['rule']}}}.axis{{stroke:{DARK['axis']}}}")
+    add(f".accent{{fill:{ACCENT_DARK}}}.bar{{fill:{ACCENT_DARK}}}")
+    add(f".track{{fill:{mix(DARK['bg'], ACCENT_DARK, 0.22)}}}")
     add("}")
     add("</style>")
 
-    add(f'<rect class="card" x=".5" y=".5" width="{WIDTH - 1}" height="{HEIGHT - 1}" rx="14"/>')
+    add(box(0.5, 0.5, WIDTH - 1, HEIGHT - 1, "card", 14))
 
-    # header: label, the one big number, the three streaks
-    add(f'<text class="label" x="{PAD}" y="44">CONTRIBUTIONS</text>')
-    add(f'<text class="ink" x="{PAD - 2}" y="108" style="{MONO};font-size:58px;font-weight:500;letter-spacing:-2px">{data["total"]:,}</text>')
-    add(f'<text class="muted" x="{PAD}" y="128" style="{SANS};font-size:11.5px">in the last 12 months</text>')
+    # header ---------------------------------------------------------------
+    add(t(PAD, 40, "A YEAR IN NUMBERS", "label"))
+    add(t(WIDTH - PAD, 40, f"{esc(login)} · SINCE {data['since']}", "label", anchor="end"))
 
-    metrics = [
-        ("CURRENT STREAK", current),
-        ("LONGEST STREAK", longest),
-        ("ACTIVE DAYS", active),
-    ]
-    for i, (label, value) in enumerate(metrics):
-        y = 62 + i * 30
-        add(f'<text class="label" x="648" y="{y}">{label}</text>')
-        add(f'<text class="ink" x="{WIDTH - PAD}" y="{y + 6}" text-anchor="end" style="{MONO};font-size:21px;font-weight:500;letter-spacing:-.5px">{value}</text>')
-
-    add(f'<line class="rule" x1="{PAD}" y1="146" x2="{WIDTH - PAD}" y2="146"/>')
-
-    # month marks: one above the column that contains the 1st
-    for col in range(cols):
-        first = None
-        for row in range(7):
-            d = start + dt.timedelta(days=col * 7 + row)
-            if d.day == 1:
-                first = d
-                break
-        if not first:
-            continue
-        x = grid_x + col * pitch
-        anchor = ' text-anchor="end"' if x + 22 > grid_x + grid_w else ""
-        x = grid_x + grid_w if anchor else x
-        add(
-            f'<text class="label" x="{x}" y="{grid_y - 10}"{anchor} '
-            f'style="letter-spacing:.8px">{first.strftime("%b").upper()}</text>'
+    # hero: consistency, the thing the heatmap implies but never says ------
+    add(t(PAD, 76, "ACTIVE DAYS", "label"))
+    add(
+        t(
+            PAD - 2,
+            140,
+            f"{active:,}",
+            "ink",
+            style="font-size:58px;font-weight:600;letter-spacing:-1.5px",
         )
+    )
+    add(
+        t(
+            PAD,
+            162,
+            f"{rate * 100:.0f}% of the last 365 days",
+            "muted",
+            style="font-size:10.5px",
+        )
+    )
 
-    rects = []
-    for col in range(cols):
-        for row in range(7):
-            d = start + dt.timedelta(days=col * 7 + row)
-            if d > today:
-                continue
-            count = by_date.get(d, 0)
-            rects.append(
-                f'<rect class="l{level(count)}" x="{grid_x + col * pitch}" y="{grid_y + row * pitch}" '
-                f'width="{cell}" height="{cell}" rx="2.5"><title>{d:%Y-%m-%d}: {count}</title></rect>'
+    # hero-right: one tile per stat, so a token without private access simply
+    # drops the private tile instead of printing a misleading zero.
+    tiles: list[tuple[str, str, str, float | None]] = []
+    if private:
+        tiles.append(
+            (
+                "PRIVATE WORK",
+                f"{private_share * 100:.0f}%",
+                f"of {total:,} contributions",
+                private_share,
             )
-    out.extend(rects)
+        )
+    tiles.append(("CURRENT STREAK", f"{current}d", "days in a row", None))
+    tiles.append(("LONGEST STREAK", f"{longest}d", "this year", None))
 
-    # language split: one equal vote per repository
-    langs = data["languages"][:5]
-    bar_y, bar_h = grid_y + grid_h + 20, 8
-    add(f'<rect class="track" x="{grid_x}" y="{bar_y}" width="{grid_w}" height="{bar_h}" rx="4"/>')
-    x = float(grid_x)
-    for i, (_, weight, _) in enumerate(langs):
-        w = grid_w * weight
-        cls = "accent" if i == 0 else "ink"
-        op = [1.0, 0.42, 0.28, 0.18, 0.12][i]
-        add(f'<rect class="{cls}" x="{x:.1f}" y="{bar_y}" width="{w:.1f}" height="{bar_h}" rx="4" opacity="{op}"/>')
-        x += w
-
-    legend_y = bar_y + 26
-    lx = float(grid_x)
-    for i, (name, weight, _) in enumerate(langs):
-        text = f"{name} {weight * 100:.0f}%"
-        op = [1.0, 0.42, 0.28, 0.18, 0.12][i]
-        cls = "accent" if i == 0 else "ink"
-        add(f'<rect class="{cls}" x="{lx:.1f}" y="{legend_y - 8}" width="7" height="7" rx="1.5" opacity="{op}"/>')
-        add(f'<text class="label" x="{lx + 12:.1f}" y="{legend_y}" style="letter-spacing:.7px">{esc(text)}</text>')
-        lx += 12 + len(text) * 5.9 + 20
-
-    note = "BY PROJECT"
-    if data["private_repos"]:
-        note += f" · INCL. {data['private_repos']} PRIVATE REPOS"
-    if langs:
+    tile_span = 400 / len(tiles)
+    for i, (label, value, sub, meter) in enumerate(tiles):
+        x = 420 + i * tile_span
+        add(t(x, 76, label, "label"))
         add(
-            f'<text class="label" x="{WIDTH - PAD}" y="{legend_y}" text-anchor="end" '
-            f'style="letter-spacing:.7px" opacity=".75">{note}</text>'
+            t(
+                x - 1,
+                128,
+                value,
+                "ink",
+                style="font-size:32px;font-weight:600;letter-spacing:-.8px",
+            )
+        )
+        add(t(x, 146, sub, "muted", style="font-size:9px"))
+        if meter is not None:
+            mw = tile_span - 24
+            add(box(x, 156, mw, 6, "track", 3))
+            add(box(x, 156, max(4.0, mw * meter), 6, "accent", 3))
+
+    add(rule(PAD, 200, WIDTH - PAD, 200))
+
+    # monthly consistency --------------------------------------------------
+    add(t(PAD, 226, "DAYS ACTIVE BY MONTH", "label"))
+    add(t(500, 226, "* CURRENT MONTH TO DATE", "label-sm", anchor="end"))
+
+    cx0, cx1 = 74.0, 500.0
+    base_y, top_y = 332.0, 248.0
+    plot_h = base_y - top_y
+    for frac, label in ((1.0, "100%"), (0.5, "50%")):
+        y = base_y - plot_h * frac
+        add(rule(cx0, y, cx1, y))
+        add(t(cx0 - 6, y + 3, label, "label-sm", anchor="end"))
+    add(t(cx0 - 6, base_y + 3, "0%", "label-sm", anchor="end"))
+    add(rule(cx0, base_y, cx1, base_y, "axis"))
+
+    n = len(monthly)
+    band = (cx1 - cx0) / n
+    bar_w = min(20.0, band * 0.58)
+    for i, (label, share, is_current) in enumerate(monthly):
+        x = cx0 + band * i + (band - bar_w) / 2
+        top = base_y - plot_h * share
+        path = column(x, top, bar_w, base_y)
+        if path:
+            add(f'<path class="bar" d="{path}"/>')
+        add(
+            t(
+                cx0 + band * i + band / 2,
+                348,
+                label + ("*" if is_current else ""),
+                "label-sm",
+                anchor="middle",
+            )
         )
 
-    # the year in numbers, the part a heatmap can't show
-    add(f'<line class="rule" x1="{PAD}" y1="338" x2="{WIDTH - PAD}" y2="338"/>')
-    stats = [
-        ("STARS", f"{data['stars']:,}"),
-        ("REPOS", f"{data['repos']:,}"),
-        ("FOLLOWERS", f"{data['followers']:,}"),
+    peak = max(range(n), key=lambda i: monthly[i][1])
+    if monthly[peak][1] > 0:
+        px = cx0 + band * peak + band / 2
+        py = base_y - plot_h * monthly[peak][1] - 6
+        add(t(px, py, f"{monthly[peak][1] * 100:.0f}%", "data-sm", anchor="middle"))
+
+    # work mix -------------------------------------------------------------
+    add(t(540, 226, "HOW THE YEAR WAS SPENT", "label"))
+    work = [
+        ("COMMITS", data["commits"]),
+        ("PULL REQUESTS", data["prs"]),
+        ("REVIEWS", data["reviews"]),
+        ("ISSUES", data["issues"]),
     ]
-    # A token that cannot see private contributions reports zero, which would
-    # read as "none" rather than "hidden". Leave the column out until they are
-    # visible; it comes back on its own once the token/profile setting allows.
-    if data["private_contribs"]:
-        stats.append(("PRIVATE CONTRIBS", f"{data['private_contribs']:,}"))
-    stats.append(("PUBLIC CONTRIBS", f"{data['public_contribs']:,}"))
-    stats.append(("SINCE", str(data["since"])))
-    for i, (label, value) in enumerate(stats):
-        x = grid_x + i * grid_w / len(stats)
-        add(f'<text class="label" x="{x:.1f}" y="362">{label}</text>')
+    for i, (label, value) in enumerate(work):
+        col, row = i % 2, i // 2
+        x = 540 + col * 156
+        y = 252 + row * 58
+        add(t(x, y, label, "label-sm"))
         add(
-            f'<text class="ink" x="{x - 1:.1f}" y="390" '
-            f'style="{MONO};font-size:20px;font-weight:500;letter-spacing:-.4px">{value}</text>'
+            t(
+                x - 1,
+                y + 30,
+                f"{value:,}",
+                "ink",
+                style="font-size:25px;font-weight:600;letter-spacing:-.6px",
+            )
         )
+    add(t(540, 358, f"ACROSS {data['touched']:,} REPOSITORIES", "label-sm"))
+
+    add(rule(PAD, 372, WIDTH - PAD, 372))
+
+    # languages: ranked bars, one hue, names and shares direct-labeled ------
+    add(t(PAD, 396, "LANGUAGES BY PROJECT", "label"))
+    langs = data["languages"][:5]
+    if len(data["languages"]) > len(langs):
+        add(t(500, 396, f"TOP {len(langs)} OF {len(data['languages'])}", "label-sm", anchor="end"))
+    if langs:
+        top_weight = langs[0][1] or 1.0
+        for i, (name, weight, _) in enumerate(langs):
+            y = 414 + i * 17
+            add(t(PAD, y + 3, esc(name), "lang"))
+            add(box(160, y - 3, 300, 6, "track", 3))
+            path = ranked_bar(160, y - 3, 300 * weight / top_weight, 6)
+            if path:
+                add(f'<path class="bar" d="{path}"/>')
+            add(t(500, y + 3, f"{weight * 100:.0f}%", "lang-val", anchor="end"))
+    else:
+        add(t(PAD, 414, "No language data", "muted", style="font-size:10px"))
+
+    # secondary stats ------------------------------------------------------
+    if delta is None or delta == 0:
+        delta_text = "—"
+    else:
+        delta_text = f"{'▲' if delta > 0 else '▼'} {abs(delta)}%"
+
+    secondary = [
+        ("LONGEST GAP", f"{gap}d", ""),
+        ("LAST 90 VS PRIOR", f"{recent:,}", delta_text),
+        ("AVG / ACTIVE DAY", f"{avg:.1f}", ""),
+        ("BUSIEST DAY", busiest, ""),
+    ]
+    for i, (label, value, extra) in enumerate(secondary):
+        col, row = i % 2, i // 2
+        x = 540 + col * 156
+        y = 396 + row * 48
+        add(t(x, y, label, "label-sm"))
+        add(
+            t(
+                x - 1,
+                y + 24,
+                value,
+                "ink",
+                style="font-size:24px;font-weight:600;letter-spacing:-.6px",
+            )
+        )
+        if extra:
+            # Rough proportional-digit width; the delta rides just past the value.
+            width = len(value) * 24 * 0.58
+            add(t(x + width + 8, y + 24, extra, "label-sm"))
 
     add("</svg>")
     return "\n".join(out)
 
 
 def preview(svg: str, path: str) -> None:
-    """Both palettes side by side, forced rather than following the OS."""
+    """Both palettes side by side, forced rather than following the OS.
+
+    Each SVG is embedded as an image, not inline: inline SVG styles are global
+    to the page, so the dark copy would otherwise repaint the light one.
+    """
+    import base64
     import re
 
     light = re.sub(r"@media \(prefers-color-scheme:dark\)\{.*?\n\}", "", svg, flags=re.S)
     dark = svg.replace("@media (prefers-color-scheme:dark){", "@media all{")
+
+    def img(source: str) -> str:
+        b64 = base64.b64encode(source.encode()).decode()
+        return f'<img src="data:image/svg+xml;base64,{b64}" width="{WIDTH}" height="{HEIGHT}">'
+
     page = f"""<!doctype html><meta charset="utf-8"><title>profile card</title>
 <style>
   body{{margin:0;padding:40px;display:grid;gap:24px;justify-content:center;
@@ -391,9 +647,10 @@ def preview(svg: str, path: str) -> None:
   .light{{background:#fff;padding:24px}}
   .dark{{background:#0d1117;padding:24px}}
   h2{{letter-spacing:1.5px;margin:0 0 14px}}
+  img{{display:block}}
 </style>
-<div class="light"><h2>LIGHT</h2>{light}</div>
-<div class="dark"><h2 style="color:#666">DARK</h2>{dark}</div>
+<div class="light"><h2>LIGHT</h2>{img(light)}</div>
+<div class="dark"><h2 style="color:#666">DARK</h2>{img(dark)}</div>
 """
     with open(path, "w") as fh:
         fh.write(page)
@@ -427,10 +684,12 @@ def main() -> None:
     if args.preview:
         preview(svg, args.preview)
 
+    active = sum(1 for _, c in data["days"] if c > 0)
     cur, longest = streaks(data["days"], data["today"])
     print(
-        f"{data['total']:,} contributions · {cur}d current · {longest}d longest · "
-        f"{data['repos']} repos ({data['private_repos']} private) → {args.out}"
+        f"{data['total']:,} contributions · {active} active days · "
+        f"{cur}d current · {longest}d longest · {data['touched']} repos touched "
+        f"→ {args.out}"
     )
 
 
