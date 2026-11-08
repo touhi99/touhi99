@@ -57,9 +57,9 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="label-sm" x="411.2" y="348.0" text-anchor="middle">SEP</text>
 <path class="bar" d="M436.8,332.0 L436.8,327.9 Q436.8,323.9 440.8,323.9 L452.8,323.9 Q456.8,323.9 456.8,327.9 L456.8,332.0 Z"/>
 <text class="label-sm" x="446.8" y="348.0" text-anchor="middle">OCT</text>
-<path class="bar" d="M472.2,332.0 L472.2,276.0 Q472.2,272.0 476.2,272.0 L488.2,272.0 Q492.2,272.0 492.2,276.0 L492.2,332.0 Z"/>
+<path class="bar" d="M472.2,332.0 L472.2,283.5 Q472.2,279.5 476.2,279.5 L488.2,279.5 Q492.2,279.5 492.2,283.5 L492.2,332.0 Z"/>
 <text class="label-sm" x="482.2" y="348.0" text-anchor="middle">NOV*</text>
-<text class="data-sm" x="482.2" y="266.0" text-anchor="middle">71%</text>
+<text class="data-sm" x="482.2" y="273.5" text-anchor="middle">62%</text>
 <text class="label" x="540.0" y="226.0">HOW THE YEAR WAS SPENT</text>
 <text class="label-sm" x="540.0" y="252.0">COMMITS</text>
 <text class="ink" x="539.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">30</text>
@@ -76,22 +76,22 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="lang" x="40.0" y="417.0">Python</text>
 <rect class="track" x="160.0" y="411.0" width="300.0" height="6.0" rx="3"/>
 <path class="bar" d="M160.0,411.0 L457.0,411.0 Q460.0,411.0 460.0,414.0 L460.0,414.0 Q460.0,417.0 457.0,417.0 L160.0,417.0 Z"/>
-<text class="lang-val" x="500.0" y="417.0" text-anchor="end">70%</text>
+<text class="lang-val" x="500.0" y="417.0" text-anchor="end">69%</text>
 <text class="lang" x="40.0" y="434.0">TypeScript</text>
 <rect class="track" x="160.0" y="428.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,428.0 L183.4,428.0 Q186.4,428.0 186.4,431.0 L186.4,431.0 Q186.4,434.0 183.4,434.0 L160.0,434.0 Z"/>
+<path class="bar" d="M160.0,428.0 L183.3,428.0 Q186.3,428.0 186.3,431.0 L186.3,431.0 Q186.3,434.0 183.3,434.0 L160.0,434.0 Z"/>
 <text class="lang-val" x="500.0" y="434.0" text-anchor="end">6%</text>
 <text class="lang" x="40.0" y="451.0">HTML</text>
 <rect class="track" x="160.0" y="445.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,445.0 L178.3,445.0 Q181.3,445.0 181.3,448.0 L181.3,448.0 Q181.3,451.0 178.3,451.0 L160.0,451.0 Z"/>
+<path class="bar" d="M160.0,445.0 L178.2,445.0 Q181.2,445.0 181.2,448.0 L181.2,448.0 Q181.2,451.0 178.2,451.0 L160.0,451.0 Z"/>
 <text class="lang-val" x="500.0" y="451.0" text-anchor="end">5%</text>
-<text class="lang" x="40.0" y="468.0">JavaScript</text>
+<text class="lang" x="40.0" y="468.0">Swift</text>
 <rect class="track" x="160.0" y="462.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,462.0 L171.6,462.0 Q174.6,462.0 174.6,465.0 L174.6,465.0 Q174.6,468.0 171.6,468.0 L160.0,468.0 Z"/>
-<text class="lang-val" x="500.0" y="468.0" text-anchor="end">3%</text>
-<text class="lang" x="40.0" y="485.0">Swift</text>
+<path class="bar" d="M160.0,462.0 L175.2,462.0 Q178.2,462.0 178.2,465.0 L178.2,465.0 Q178.2,468.0 175.2,468.0 L160.0,468.0 Z"/>
+<text class="lang-val" x="500.0" y="468.0" text-anchor="end">4%</text>
+<text class="lang" x="40.0" y="485.0">JavaScript</text>
 <rect class="track" x="160.0" y="479.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,479.0 L170.4,479.0 Q173.4,479.0 173.4,482.0 L173.4,482.0 Q173.4,485.0 170.4,485.0 L160.0,485.0 Z"/>
+<path class="bar" d="M160.0,479.0 L171.5,479.0 Q174.5,479.0 174.5,482.0 L174.5,482.0 Q174.5,485.0 171.5,485.0 L160.0,485.0 Z"/>
 <text class="lang-val" x="500.0" y="485.0" text-anchor="end">3%</text>
 <text class="label-sm" x="540.0" y="396.0">LONGEST GAP</text>
 <text class="ink" x="539.0" y="420.0" style="font-size:24px;font-weight:600;letter-spacing:-.6px">305d</text>
