@@ -237,15 +237,6 @@ def streaks(days: list[tuple[str, int]], today: dt.date) -> tuple[int, int]:
     return current, longest
 
 
-def longest_gap(days: list[tuple[str, int]]) -> int:
-    """Longest run of consecutive days without a contribution."""
-    longest = run = 0
-    for _, count in days:
-        run = run + 1 if count == 0 else 0
-        longest = max(longest, run)
-    return longest
-
-
 def add_months(day: dt.date, delta: int) -> dt.date:
     y = day.year + (day.month - 1 + delta) // 12
     m = (day.month - 1 + delta) % 12 + 1
@@ -281,17 +272,13 @@ def monthly_consistency(
     return out
 
 
-def momentum(days: list[tuple[str, int]], today: dt.date) -> tuple[int, int | None]:
-    """(last 90 days, percent change vs the 90 before), or None without history."""
-    by_date = {dt.date.fromisoformat(d): c for d, c in days}
-    recent_lo = today - dt.timedelta(days=89)
-    prior_hi = today - dt.timedelta(days=90)
-    prior_lo = today - dt.timedelta(days=179)
-    recent = sum(c for d, c in by_date.items() if recent_lo <= d <= today)
-    prior = sum(c for d, c in by_date.items() if prior_lo <= d <= prior_hi)
-    if prior == 0:
-        return recent, None
-    return recent, round((recent - prior) / prior * 100)
+def best_month(days: list[tuple[str, int]]) -> str:
+    """Three-letter name of the calendar month with the most contributions."""
+    totals: dict[str, int] = {}
+    for d, count in days:
+        key = dt.date.fromisoformat(d).strftime("%b").upper()
+        totals[key] = totals.get(key, 0) + count
+    return max(totals, key=totals.get) if totals else "—"
 
 
 def busiest_day(days: list[tuple[str, int]]) -> str:
@@ -386,13 +373,12 @@ def build(data: dict) -> str:
     active = sum(1 for _, c in days if c > 0)
     rate = active / len(days) if days else 0.0
     current, longest = streaks(days, today)
-    gap = longest_gap(days)
-    avg = total / active if active else 0.0
     private = data["private_contribs"]
     private_share = private / total if total else 0.0
     monthly = monthly_consistency(days, today)
-    recent, delta = momentum(days, today)
+    most_in_day = max((c for _, c in days), default=0)
     busiest = busiest_day(days)
+    top_month = best_month(days)
     login = data["login"]
 
     out: list[str] = []
@@ -450,12 +436,12 @@ def build(data: dict) -> str:
     add(t(WIDTH - PAD, 40, f"{esc(login)} · SINCE {data['since']}", "label", anchor="end"))
 
     # hero: consistency, the thing the heatmap implies but never says ------
-    add(t(PAD, 76, "ACTIVE DAYS", "label"))
+    add(t(PAD, 76, "CONTRIBUTIONS", "label"))
     add(
         t(
             PAD - 2,
             140,
-            f"{active:,}",
+            f"{total:,}",
             "ink",
             style="font-size:58px;font-weight:600;letter-spacing:-1.5px",
         )
@@ -464,7 +450,7 @@ def build(data: dict) -> str:
         t(
             PAD,
             162,
-            f"{rate * 100:.0f}% of the last 365 days",
+            "in the last 365 days",
             "muted",
             style="font-size:10.5px",
         )
@@ -590,16 +576,11 @@ def build(data: dict) -> str:
         add(t(PAD, 414, "No language data", "muted", style="font-size:10px"))
 
     # secondary stats ------------------------------------------------------
-    if delta is None or delta == 0:
-        delta_text = "—"
-    else:
-        delta_text = f"{'▲' if delta > 0 else '▼'} {abs(delta)}%"
-
     secondary = [
-        ("LONGEST GAP", f"{gap}d", ""),
-        ("LAST 90 VS PRIOR", f"{recent:,}", delta_text),
-        ("AVG / ACTIVE DAY", f"{avg:.1f}", ""),
-        ("BUSIEST DAY", busiest, ""),
+        ("BEST MONTH", top_month, ""),
+        ("LANGUAGES USED", f"{len(data['languages'])}", ""),
+        ("MOST IN ONE DAY", f"{most_in_day:,}", ""),
+        ("BUSIEST WEEKDAY", busiest, ""),
     ]
     for i, (label, value, extra) in enumerate(secondary):
         col, row = i % 2, i // 2
