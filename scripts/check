@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+step() { printf '== %s\n' "$1"; }
+
+step "ruff format"
+uvx -q ruff@0.14.5 format --check .
+
+step "ruff lint"
+uvx -q ruff@0.14.5 check .
+
+step "mypy"
+uvx -q mypy@1.18.2 stats/generate.py
+
+step "shell syntax"
+bash -n scripts/check
+
+step "docs and comments"
+git ls-files -z --cached --others --exclude-standard | xargs -0 python3 -I scripts/slop_check.py
+
+echo "all checks passed"
