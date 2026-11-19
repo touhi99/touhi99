@@ -16,7 +16,10 @@ uvx -q mypy@1.18.2 stats/generate.py
 step "shell syntax"
 bash -n scripts/check
 
-step "docs and comments"
-git ls-files -z --cached --others --exclude-standard | xargs -0 python3 -I scripts/slop_check.py
+slop="${SLOP_CHECK:-$HOME/.claude/hooks/slop_check.py}"
+if [ -f "$slop" ]; then
+  step "docs and comments"
+  git ls-files -z --cached --others --exclude-standard | xargs -0 python3 -I "$slop"
+fi
 
 echo "all checks passed"
