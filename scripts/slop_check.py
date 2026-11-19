@@ -94,6 +94,9 @@ def comment_start(line: str, ext: str) -> tuple[int, str] | None:
                 continue
             if c == quote:
                 quote = None
+        elif c == "\\":
+            i += 2
+            continue
         elif c == '"' or (c in "'`" and ext in {".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".py", ".sh", ".css"}):
             quote = c
         elif ext in SLASH_LANGS and line.startswith("//", i):
