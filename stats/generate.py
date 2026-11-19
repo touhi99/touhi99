@@ -24,8 +24,6 @@ import subprocess
 import sys
 import urllib.request
 
-# --- look -----------------------------------------------------------------
-
 WIDTH, HEIGHT = 880, 500
 PAD = 40
 ACCENT_LIGHT = "#C25436"
@@ -35,7 +33,7 @@ LIGHT = {
     "bg": "#FAF8F5",
     "border": "#E8E2D8",
     "ink": "#17150F",
-    "muted": "#6F675C",  # 5.25:1 on bg — safe for 8-10px labels
+    "muted": "#6F675C",
     "rule": "#E4DED3",
     "axis": "#D8D1C4",
     "empty": "#EFECE5",
@@ -51,14 +49,9 @@ DARK = {
 }
 
 MONO_FAMILY = "ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace"
-SANS_FAMILY = (
-    "ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
-)
+SANS_FAMILY = "ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
 
-# Kept out of the repositories/language stats: rendered artefacts, vendored
-# bundles, anything whose size says nothing about what you work in. Contribution
-# counts still include these repos — only the repo-level numbers skip them.
-EXCLUDE = {"master-thesis"}
+EXCLUDE = set(filter(None, os.environ.get("STATS_EXCLUDE", "").split(",")))
 
 GRAPHQL = """
 query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
@@ -77,7 +70,7 @@ query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
       commitContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
       pullRequestContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
       issueContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
-      pullRequestReviewContributionsByRepository(maxRepositories:100) { repository { nameWithOwner } }
+      pullRequestReviewContributionsByRepository(maxRepositories:100) {repository {nameWithOwner}}
     }
     repositories(first:100, after:$after, ownerAffiliations:OWNER, isFork:false) {
       totalCount
@@ -93,9 +86,6 @@ query($login:String!, $from:DateTime!, $to:DateTime!, $after:String) {
   }
 }
 """
-
-
-# --- data -----------------------------------------------------------------
 
 
 def token() -> str:
@@ -129,7 +119,7 @@ def graphql(query: str, variables: dict, tok: str) -> dict:
 
 
 def fetch(login: str, tok: str) -> dict:
-    today = dt.datetime.now(dt.timezone.utc).date()
+    today = dt.datetime.now(dt.UTC).date()
     start = today - dt.timedelta(days=364)
     variables = {
         "login": login,
@@ -159,15 +149,8 @@ def fetch(login: str, tok: str) -> dict:
         for w in cal["weeks"]
         for d in w["contributionDays"]
     ]
-    # The calendar is Sunday-aligned, so it can carry a few days beyond the
-    # requested window. Every stat below uses exactly the 365-day window.
-    days = [
-        (d, c)
-        for d, c in all_days
-        if start <= dt.date.fromisoformat(d) <= today
-    ]
+    days = [(d, c) for d, c in all_days if start <= dt.date.fromisoformat(d) <= today]
 
-    # Count repositories touched without ever storing a name for the card.
     touched: set[str] = set()
     for key in (
         "commitContributionsByRepository",
@@ -184,8 +167,7 @@ def fetch(login: str, tok: str) -> dict:
         "days": days,
         "total": cal["totalContributions"],
         "private_contribs": coll["restrictedContributionsCount"],
-        "public_contribs": cal["totalContributions"]
-        - coll["restrictedContributionsCount"],
+        "public_contribs": cal["totalContributions"] - coll["restrictedContributionsCount"],
         "since": int(user["createdAt"][:4]),
         "repos": len(repos),
         "private_repos": sum(1 for r in repos if r["isPrivate"]),
@@ -228,7 +210,7 @@ def streaks(days: list[tuple[str, int]], today: dt.date) -> tuple[int, int]:
 
     counts = [c for _, c in days]
     i = len(counts) - 1
-    if i >= 0 and counts[i] == 0:  # today may simply be young
+    if i >= 0 and counts[i] == 0:
         i -= 1
     current = 0
     while i >= 0 and counts[i] > 0:
@@ -278,7 +260,7 @@ def best_month(days: list[tuple[str, int]]) -> str:
     for d, count in days:
         key = dt.date.fromisoformat(d).strftime("%b").upper()
         totals[key] = totals.get(key, 0) + count
-    return max(totals, key=totals.get) if totals else "—"
+    return max(totals, key=lambda month: totals[month]) if totals else "—"
 
 
 def busiest_day(days: list[tuple[str, int]]) -> str:
@@ -293,13 +275,10 @@ def busiest_day(days: list[tuple[str, int]]) -> str:
     return names[max(range(7), key=lambda i: avg[i])]
 
 
-# --- drawing --------------------------------------------------------------
-
-
 def mix(a: str, b: str, t: float) -> str:
     av = [int(a[i : i + 2], 16) for i in (1, 3, 5)]
     bv = [int(b[i : i + 2], 16) for i in (1, 3, 5)]
-    return "#" + "".join(f"{round(x + (y - x) * t):02X}" for x, y in zip(av, bv))
+    return "#" + "".join(f"{round(x + (y - x) * t):02X}" for x, y in zip(av, bv, strict=True))
 
 
 def esc(text: str) -> str:
@@ -334,8 +313,7 @@ def rule(x1: float, y1: float, x2: float, y2: float, cls: str = "rule") -> str:
 
 def box(x: float, y: float, w: float, h: float, cls: str, rx: float = 0) -> str:
     return (
-        f'<rect class="{cls}" x="{x:.1f}" y="{y:.1f}" '
-        f'width="{w:.1f}" height="{h:.1f}" rx="{rx}"/>'
+        f'<rect class="{cls}" x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" rx="{rx}"/>'
     )
 
 
@@ -431,11 +409,17 @@ def build(data: dict) -> str:
 
     add(box(0.5, 0.5, WIDTH - 1, HEIGHT - 1, "card", 14))
 
-    # header ---------------------------------------------------------------
     add(t(PAD, 40, "A YEAR IN NUMBERS", "label"))
-    add(t(WIDTH - PAD, 40, f"{esc(login)} · SINCE {data['since']}", "label", anchor="end"))
+    add(
+        t(
+            WIDTH - PAD,
+            40,
+            f"{esc(login)} · SINCE {data['since']}",
+            "label",
+            anchor="end",
+        )
+    )
 
-    # hero: consistency, the thing the heatmap implies but never says ------
     add(t(PAD, 76, "CONTRIBUTIONS", "label"))
     add(
         t(
@@ -456,8 +440,6 @@ def build(data: dict) -> str:
         )
     )
 
-    # hero-right: one tile per stat, so a token without private access simply
-    # drops the private tile instead of printing a misleading zero.
     tiles: list[tuple[str, str, str, float | None]] = []
     if private:
         tiles.append(
@@ -492,7 +474,6 @@ def build(data: dict) -> str:
 
     add(rule(PAD, 200, WIDTH - PAD, 200))
 
-    # monthly consistency --------------------------------------------------
     add(t(PAD, 226, "DAYS ACTIVE BY MONTH", "label"))
     add(t(500, 226, "* CURRENT MONTH TO DATE", "label-sm", anchor="end"))
 
@@ -531,7 +512,6 @@ def build(data: dict) -> str:
         py = base_y - plot_h * monthly[peak][1] - 6
         add(t(px, py, f"{monthly[peak][1] * 100:.0f}%", "data-sm", anchor="middle"))
 
-    # work mix -------------------------------------------------------------
     add(t(540, 226, "HOW THE YEAR WAS SPENT", "label"))
     work = [
         ("COMMITS", data["commits"]),
@@ -557,11 +537,18 @@ def build(data: dict) -> str:
 
     add(rule(PAD, 372, WIDTH - PAD, 372))
 
-    # languages: ranked bars, one hue, names and shares direct-labeled ------
     add(t(PAD, 396, "LANGUAGES BY PROJECT", "label"))
     langs = data["languages"][:5]
     if len(data["languages"]) > len(langs):
-        add(t(500, 396, f"TOP {len(langs)} OF {len(data['languages'])}", "label-sm", anchor="end"))
+        add(
+            t(
+                500,
+                396,
+                f"TOP {len(langs)} OF {len(data['languages'])}",
+                "label-sm",
+                anchor="end",
+            )
+        )
     if langs:
         top_weight = langs[0][1] or 1.0
         for i, (name, weight, _) in enumerate(langs):
@@ -575,7 +562,6 @@ def build(data: dict) -> str:
     else:
         add(t(PAD, 414, "No language data", "muted", style="font-size:10px"))
 
-    # secondary stats ------------------------------------------------------
     secondary = [
         ("BEST MONTH", top_month, ""),
         ("LANGUAGES USED", f"{len(data['languages'])}", ""),
@@ -597,7 +583,6 @@ def build(data: dict) -> str:
             )
         )
         if extra:
-            # Rough proportional-digit width; the delta rides just past the value.
             width = len(value) * 24 * 0.58
             add(t(x + width + 8, y + 24, extra, "label-sm"))
 

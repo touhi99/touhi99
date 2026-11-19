@@ -32,6 +32,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.STATS_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_LOGIN: touhi99
+          STATS_EXCLUDE: ${{ secrets.STATS_EXCLUDE }}
         run: python3 stats/generate.py --out stats/card.svg --require-private
 
       - name: Commit
