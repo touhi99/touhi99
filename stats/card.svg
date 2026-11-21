@@ -30,7 +30,7 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="ink" x="38.0" y="140.0" style="font-size:58px;font-weight:600;letter-spacing:-1.5px">110</text>
 <text class="muted" x="40.0" y="162.0" style="font-size:10.5px">in the last 365 days</text>
 <text class="label" x="420.0" y="76.0">CURRENT STREAK</text>
-<text class="ink" x="419.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">3d</text>
+<text class="ink" x="419.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">0d</text>
 <text class="muted" x="420.0" y="146.0" style="font-size:9px">days in a row</text>
 <text class="label" x="620.0" y="76.0">LONGEST STREAK</text>
 <text class="ink" x="619.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">6d</text>
@@ -57,9 +57,9 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="label-sm" x="411.2" y="348.0" text-anchor="middle">SEP</text>
 <path class="bar" d="M436.8,332.0 L436.8,327.9 Q436.8,323.9 440.8,323.9 L452.8,323.9 Q456.8,323.9 456.8,327.9 L456.8,332.0 Z"/>
 <text class="label-sm" x="446.8" y="348.0" text-anchor="middle">OCT</text>
-<path class="bar" d="M472.2,332.0 L472.2,281.4 Q472.2,277.4 476.2,277.4 L488.2,277.4 Q492.2,277.4 492.2,281.4 L492.2,332.0 Z"/>
+<path class="bar" d="M472.2,332.0 L472.2,284.0 Q472.2,280.0 476.2,280.0 L488.2,280.0 Q492.2,280.0 492.2,284.0 L492.2,332.0 Z"/>
 <text class="label-sm" x="482.2" y="348.0" text-anchor="middle">NOV*</text>
-<text class="data-sm" x="482.2" y="271.4" text-anchor="middle">65%</text>
+<text class="data-sm" x="482.2" y="274.0" text-anchor="middle">62%</text>
 <text class="label" x="540.0" y="226.0">HOW THE YEAR WAS SPENT</text>
 <text class="label-sm" x="540.0" y="252.0">COMMITS</text>
 <text class="ink" x="539.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">81</text>
@@ -76,22 +76,22 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="lang" x="40.0" y="417.0">Python</text>
 <rect class="track" x="160.0" y="411.0" width="300.0" height="6.0" rx="3"/>
 <path class="bar" d="M160.0,411.0 L457.0,411.0 Q460.0,411.0 460.0,414.0 L460.0,414.0 Q460.0,417.0 457.0,417.0 L160.0,417.0 Z"/>
-<text class="lang-val" x="500.0" y="417.0" text-anchor="end">66%</text>
+<text class="lang-val" x="500.0" y="417.0" text-anchor="end">64%</text>
 <text class="lang" x="40.0" y="434.0">TypeScript</text>
 <rect class="track" x="160.0" y="428.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,428.0 L192.4,428.0 Q195.4,428.0 195.4,431.0 L195.4,431.0 Q195.4,434.0 192.4,434.0 L160.0,434.0 Z"/>
-<text class="lang-val" x="500.0" y="434.0" text-anchor="end">8%</text>
+<path class="bar" d="M160.0,428.0 L202.1,428.0 Q205.1,428.0 205.1,431.0 L205.1,431.0 Q205.1,434.0 202.1,434.0 L160.0,434.0 Z"/>
+<text class="lang-val" x="500.0" y="434.0" text-anchor="end">10%</text>
 <text class="lang" x="40.0" y="451.0">Swift</text>
 <rect class="track" x="160.0" y="445.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,445.0 L186.0,445.0 Q189.0,445.0 189.0,448.0 L189.0,448.0 Q189.0,451.0 186.0,451.0 L160.0,451.0 Z"/>
+<path class="bar" d="M160.0,445.0 L186.8,445.0 Q189.8,445.0 189.8,448.0 L189.8,448.0 Q189.8,451.0 186.8,451.0 L160.0,451.0 Z"/>
 <text class="lang-val" x="500.0" y="451.0" text-anchor="end">6%</text>
 <text class="lang" x="40.0" y="468.0">HTML</text>
 <rect class="track" x="160.0" y="462.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,462.0 L179.9,462.0 Q182.9,462.0 182.9,465.0 L182.9,465.0 Q182.9,468.0 179.9,468.0 L160.0,468.0 Z"/>
+<path class="bar" d="M160.0,462.0 L180.2,462.0 Q183.2,462.0 183.2,465.0 L183.2,465.0 Q183.2,468.0 180.2,468.0 L160.0,468.0 Z"/>
 <text class="lang-val" x="500.0" y="468.0" text-anchor="end">5%</text>
 <text class="lang" x="40.0" y="485.0">Rust</text>
 <rect class="track" x="160.0" y="479.0" width="300.0" height="6.0" rx="3"/>
-<path class="bar" d="M160.0,479.0 L174.0,479.0 Q177.0,479.0 177.0,482.0 L177.0,482.0 Q177.0,485.0 174.0,485.0 L160.0,485.0 Z"/>
+<path class="bar" d="M160.0,479.0 L173.5,479.0 Q176.5,479.0 176.5,482.0 L176.5,482.0 Q176.5,485.0 173.5,485.0 L160.0,485.0 Z"/>
 <text class="lang-val" x="500.0" y="485.0" text-anchor="end">4%</text>
 <text class="label-sm" x="540.0" y="396.0">BEST MONTH</text>
 <text class="ink" x="539.0" y="420.0" style="font-size:24px;font-weight:600;letter-spacing:-.6px">NOV</text>
