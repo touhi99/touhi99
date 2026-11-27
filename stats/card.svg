@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="880" height="500" viewBox="0 0 880 500" role="img" aria-labelledby="t" aria-describedby="d">
 <title id="t">touhi99 — a year in numbers</title>
-<desc id="d">26 active days (7% of the year), 229 contributions, 166 commits, 56 pull requests, 0 reviews, 4 issues, across 8 repositories.</desc>
+<desc id="d">27 active days (7% of the year), 234 contributions, 169 commits, 58 pull requests, 0 reviews, 4 issues, across 8 repositories.</desc>
 <style>
 text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-kerning:normal}
 .label{font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;font-size:9.5px;letter-spacing:1.5px;fill:#6F675C}
@@ -27,10 +27,10 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="label" x="40.0" y="40.0">A YEAR IN NUMBERS</text>
 <text class="label" x="840.0" y="40.0" text-anchor="end">touhi99 · SINCE 2016</text>
 <text class="label" x="40.0" y="76.0">CONTRIBUTIONS</text>
-<text class="ink" x="38.0" y="140.0" style="font-size:58px;font-weight:600;letter-spacing:-1.5px">229</text>
+<text class="ink" x="38.0" y="140.0" style="font-size:58px;font-weight:600;letter-spacing:-1.5px">234</text>
 <text class="muted" x="40.0" y="162.0" style="font-size:10.5px">in the last 365 days</text>
 <text class="label" x="420.0" y="76.0">CURRENT STREAK</text>
-<text class="ink" x="419.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">9d</text>
+<text class="ink" x="419.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">1d</text>
 <text class="muted" x="420.0" y="146.0" style="font-size:9px">days in a row</text>
 <text class="label" x="620.0" y="76.0">LONGEST STREAK</text>
 <text class="ink" x="619.0" y="128.0" style="font-size:32px;font-weight:600;letter-spacing:-.8px">9d</text>
@@ -57,14 +57,14 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="label-sm" x="411.2" y="348.0" text-anchor="middle">SEP</text>
 <path class="bar" d="M436.8,332.0 L436.8,327.9 Q436.8,323.9 440.8,323.9 L452.8,323.9 Q456.8,323.9 456.8,327.9 L456.8,332.0 Z"/>
 <text class="label-sm" x="446.8" y="348.0" text-anchor="middle">OCT</text>
-<path class="bar" d="M472.2,332.0 L472.2,268.2 Q472.2,264.2 476.2,264.2 L488.2,264.2 Q492.2,264.2 492.2,268.2 L492.2,332.0 Z"/>
+<path class="bar" d="M472.2,332.0 L472.2,267.6 Q472.2,263.6 476.2,263.6 L488.2,263.6 Q492.2,263.6 492.2,267.6 L492.2,332.0 Z"/>
 <text class="label-sm" x="482.2" y="348.0" text-anchor="middle">NOV*</text>
-<text class="data-sm" x="482.2" y="258.2" text-anchor="middle">81%</text>
+<text class="data-sm" x="482.2" y="257.6" text-anchor="middle">81%</text>
 <text class="label" x="540.0" y="226.0">HOW THE YEAR WAS SPENT</text>
 <text class="label-sm" x="540.0" y="252.0">COMMITS</text>
-<text class="ink" x="539.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">166</text>
+<text class="ink" x="539.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">169</text>
 <text class="label-sm" x="696.0" y="252.0">PULL REQUESTS</text>
-<text class="ink" x="695.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">56</text>
+<text class="ink" x="695.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">58</text>
 <text class="label-sm" x="540.0" y="310.0">REVIEWS</text>
 <text class="ink" x="539.0" y="340.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">0</text>
 <text class="label-sm" x="696.0" y="310.0">ISSUES</text>
