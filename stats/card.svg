@@ -57,9 +57,9 @@ text{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helve
 <text class="label-sm" x="411.2" y="348.0" text-anchor="middle">SEP</text>
 <path class="bar" d="M436.8,332.0 L436.8,327.9 Q436.8,323.9 440.8,323.9 L452.8,323.9 Q456.8,323.9 456.8,327.9 L456.8,332.0 Z"/>
 <text class="label-sm" x="446.8" y="348.0" text-anchor="middle">OCT</text>
-<path class="bar" d="M472.2,332.0 L472.2,267.6 Q472.2,263.6 476.2,263.6 L488.2,263.6 Q492.2,263.6 492.2,267.6 L492.2,332.0 Z"/>
+<path class="bar" d="M472.2,332.0 L472.2,270.0 Q472.2,266.0 476.2,266.0 L488.2,266.0 Q492.2,266.0 492.2,270.0 L492.2,332.0 Z"/>
 <text class="label-sm" x="482.2" y="348.0" text-anchor="middle">NOV*</text>
-<text class="data-sm" x="482.2" y="257.6" text-anchor="middle">81%</text>
+<text class="data-sm" x="482.2" y="260.0" text-anchor="middle">79%</text>
 <text class="label" x="540.0" y="226.0">HOW THE YEAR WAS SPENT</text>
 <text class="label-sm" x="540.0" y="252.0">COMMITS</text>
 <text class="ink" x="539.0" y="282.0" style="font-size:25px;font-weight:600;letter-spacing:-.6px">169</text>
